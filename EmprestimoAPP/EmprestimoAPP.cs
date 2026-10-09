@@ -19,8 +19,8 @@ namespace EmprestimoAPP
             CarregarGrid();
         }
 
-        // Botão abre a tela de cadastro
-        private void btnNovo_Click(object sender, EventArgs e)
+        // Menu Arquivo > Adicionar: abre a tela de cadastro
+        private void adicionarToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using (FormNovoEmprestimo form = new FormNovoEmprestimo())
             {
@@ -34,7 +34,7 @@ namespace EmprestimoAPP
         // Botão marca como Devolvido
         private void btnDevolver_Click(object sender, EventArgs e)
         {
-            if (dataGridView1.CurrentRow == null)
+            if (dataGridView1.SelectedRows.Count == 0)
             {
                 MessageBox.Show(
                     "Selecione um item na lista primeiro.",
@@ -49,10 +49,10 @@ namespace EmprestimoAPP
             try
             {
                 int id = Convert.ToInt32(
-                    dataGridView1.CurrentRow.Cells["Id"].Value
+                    dataGridView1.SelectedRows[0].Cells["Id"].Value
                 );
 
-                string status = dataGridView1.CurrentRow
+                string status = dataGridView1.SelectedRows[0]
                     .Cells["Status"]
                     .Value?
                     .ToString();
@@ -91,6 +91,67 @@ namespace EmprestimoAPP
                     MessageBoxIcon.Error
                 );
             }
+        }
+
+        // Menu Arquivo > Excluir: apaga o empréstimo selecionado
+        private void excluirToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (dataGridView1.SelectedRows.Count == 0)
+            {
+                MessageBox.Show(
+                    "Selecione um item na lista primeiro.",
+                    "Aviso",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning
+                );
+
+                return;
+            }
+
+            DataGridViewRow linha = dataGridView1.SelectedRows[0];
+
+            int id = Convert.ToInt32(linha.Cells["Id"].Value);
+            string item = linha.Cells["Item"].Value?.ToString();
+            string amigo = linha.Cells["Amigo"].Value?.ToString();
+
+            DialogResult resultado = MessageBox.Show(
+                "Deseja excluir o empréstimo de \"" + item + "\" para " + amigo + "?",
+                "Pergunta",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question
+            );
+
+            if (resultado != DialogResult.Yes)
+                return;
+
+            try
+            {
+                db.ExcluirEmprestimo(id);
+
+                MessageBox.Show(
+                    "Empréstimo excluído com sucesso!",
+                    "Sucesso",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information
+                );
+
+                CarregarGrid();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    ex.Message,
+                    "Erro",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                );
+            }
+        }
+
+        // Menu Arquivo > Sair
+        private void sairToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
         }
 
         // Carrega os dados no DataGridView

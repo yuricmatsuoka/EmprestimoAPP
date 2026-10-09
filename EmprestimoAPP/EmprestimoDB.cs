@@ -130,4 +130,29 @@ public class EmprestimoDB
             CN.Close();
         }
     }
+
+    public void ExcluirEmprestimo(int id)
+    {
+        MySqlConnection CN = new MySqlConnection(conexao);
+        MySqlCommand Com = CN.CreateCommand();
+
+        Com.CommandText = "DELETE FROM Emprestimos WHERE Id = ?id";
+        Com.Parameters.AddWithValue("?id", id);
+
+        try
+        {
+            CN.Open();
+            Com.ExecuteNonQuery();
+        }
+        catch (MySqlException)
+        {
+            throw new Exception(
+                "Erro ao excluir o empréstimo do banco de dados."
+            );
+        }
+        finally
+        {
+            CN.Close();
+        }
+    }
 }
